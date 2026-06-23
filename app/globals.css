@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ---- Light theme — "true Claude" ivory + clay (DEFAULT) ---- */
+  :root {
+    color-scheme: light;
+    --base: 240 238 230; /* #F0EEE6 */
+    --surface-1: 250 249 245; /* #FAF9F5 */
+    --surface-2: 255 255 255; /* #FFFFFF */
+    --surface-3: 244 242 235; /* #F4F2EB */
+    --ink: 28 25 23; /* #1C1917 */
+    --ink-muted: 87 83 78; /* #57534E */
+    --ink-faint: 122 117 110; /* #7A756E — readable tertiary on cream */
+    --line: rgba(28, 25, 23, 0.1);
+    --line-strong: rgba(28, 25, 23, 0.16);
+    --sheen: rgba(255, 255, 255, 0.85); /* edge highlight — lighter than surface */
+    --scroll-thumb: #d8d3c8;
+    --ring: 217 119 87;
+    --accent-ink: #be5a3a; /* legible accent text on cream (rust) */
+    --wash: rgba(255, 255, 255, 0.92); /* light shining through */
+    --shadow-card: 0 1px 2px 0 rgba(28, 25, 23, 0.05),
+      0 14px 34px -18px rgba(28, 25, 23, 0.16);
+    --shadow-glow: 0 0 0 1px rgba(217, 119, 87, 0.22),
+      0 14px 36px -20px rgba(217, 119, 87, 0.2);
+  }
+
+  /* ---- Dark theme (opt-in via toggle) ---- */
+  html.dark {
+    color-scheme: dark;
+    --base: 7 7 10;
+    --surface-1: 12 12 17;
+    --surface-2: 18 18 25;
+    --surface-3: 26 26 36;
+    --ink: 244 244 246;
+    --ink-muted: 167 167 180;
+    --ink-faint: 111 111 126;
+    --line: rgba(255, 255, 255, 0.08);
+    --line-strong: rgba(255, 255, 255, 0.14);
+    --sheen: rgba(255, 255, 255, 0.14);
+    --scroll-thumb: #23232f;
+    --accent-ink: #f0a56a; /* accent text glows on dark (amber) */
+    --wash: rgba(255, 255, 255, 0.11); /* same light, bleeding through the dark */
+    --shadow-card: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+      0 24px 48px -24px rgba(0, 0, 0, 0.8);
+    --shadow-glow: 0 0 0 1px rgba(217, 119, 87, 0.2),
+      0 20px 60px -20px rgba(217, 119, 87, 0.4);
+  }
+
+  /* ---- The "live system preview" is an app screen: stays dark in every theme ---- */
+  [data-panel="dark"] {
+    color-scheme: dark;
+    --base: 7 7 10;
+    --surface-1: 12 12 17;
+    --surface-2: 18 18 25;
+    --surface-3: 26 26 36;
+    --ink: 244 244 246;
+    --ink-muted: 167 167 180;
+    --ink-faint: 111 111 126;
+    --line: rgba(255, 255, 255, 0.08);
+    --line-strong: rgba(255, 255, 255, 0.14);
+    --sheen: rgba(255, 255, 255, 0.14);
+    --accent-ink: #f0a56a;
+    --shadow-card: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+      0 24px 48px -24px rgba(0, 0, 0, 0.8);
+  }
+
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: rgb(var(--base));
+    color: rgb(var(--ink));
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgba(217, 119, 87, 0.28);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--ring));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Honor reduced-motion globally: animations collapse, but layout is untouched. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Section vertical rhythm */
+  .section {
+    @apply relative py-24 sm:py-28 lg:py-36;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-eyebrow font-medium uppercase text-ink-muted;
+  }
+
+  /* Accent gradient text — reserved for large display type only */
+  .text-grad {
+    @apply bg-accent-grad bg-clip-text text-transparent;
+  }
+
+  /* Hairline-bordered glass surface */
+  .glass {
+    @apply border border-line bg-surface-1/70 backdrop-blur-xl;
+  }
+}
+
+/* Thin, on-brand scrollbar (progressive enhancement) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: rgb(var(--base));
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 999px;
+  border: 2px solid rgb(var(--base));
+}
+::-webkit-scrollbar-thumb:hover {
+  filter: brightness(1.25);
+}
