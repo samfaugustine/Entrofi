@@ -4,6 +4,8 @@ A single-page guide to setting up and getting the most out of [Claude Code](http
 
 It's a self-contained `index.html` — no build step, no dependencies, works offline. Open it in any browser, or serve it (see below).
 
+**In a hurry?** [`overview.html`](overview.html) is the one-screen companion — the same habits distilled to a single visual page (context budget, CLAUDE.md, Obsidian, Cowork, power features, and a do/don't).
+
 ## What's inside
 
 - **The amplification stack** — the mental model: context, tools, reuse, scale.

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code — at a glance</title>
+<meta name="description" content="The one-screen version: the handful of habits that separate using Claude Code from getting the most out of it.">
+<style>
+  :root {
+    --bg: #faf9f6;
+    --surface: #ffffff;
+    --surface-2: #f4f2ec;
+    --ink: #1a1a18;
+    --text: #46453f;
+    --muted: #76746c;
+    --line: rgba(26,26,24,0.10);
+    --line-strong: rgba(26,26,24,0.16);
+    --brand: #c2602f;
+    --brand-soft: #d97757;
+    --code-bg: #f4f2ec;
+    --radius: 14px;
+    --maxw: 940px;
+    --c-gray: #5f5e5a;
+    --c-teal: #0f6e56;
+    --c-purple: #534ab7;
+    --c-coral: #d85a30;
+    --c-pink: #993556;
+    --c-blue: #185fa5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1916;
+      --surface: #222019;
+      --surface-2: #2a281f;
+      --ink: #f3f1ea;
+      --text: #cfccc2;
+      --muted: #9b988d;
+      --line: rgba(255,255,255,0.10);
+      --line-strong: rgba(255,255,255,0.16);
+      --brand: #e0895f;
+      --brand-soft: #d97757;
+      --code-bg: #161510;
+      --c-gray: #b4b2a9;
+      --c-teal: #5dcaa5;
+      --c-purple: #afa9ec;
+      --c-coral: #f0997b;
+      --c-pink: #ed93b1;
+      --c-blue: #85b7eb;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { color: var(--ink); font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
+  a { color: var(--brand); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.86em; background: var(--code-bg); padding: 0.12em 0.4em;
+    border-radius: 6px; border: 1px solid var(--line); color: var(--ink);
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(140%) blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner { max-width: var(--maxw); margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .nav-brand { font-weight: 600; color: var(--ink); margin-right: auto; display: flex; align-items: center; gap: 9px; }
+  .nav-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--brand-soft); display: inline-block; }
+  .nav-inner a.link { color: var(--muted); font-size: 14.5px; }
+  .nav-inner a.link:hover { color: var(--ink); text-decoration: none; }
+  .nav-inner a.link.cta { color: var(--brand); font-weight: 500; }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+  section { scroll-margin-top: 72px; padding: 34px 0; border-top: 1px solid var(--line); }
+  .kicker { text-transform: uppercase; letter-spacing: 0.13em; font-size: 12.5px; font-weight: 600; color: var(--brand); margin: 0 0 10px; }
+  section h2 { font-size: 27px; margin: 4px 0 6px; }
+  section > .wrap > p:first-of-type { margin-top: 8px; }
+  p { margin: 14px 0; }
+
+  header.hero { padding: 60px 0 30px; }
+  header.hero h1 { font-size: 46px; margin: 0 0 18px; }
+  .lede { font-size: 21px; color: var(--text); max-width: 760px; margin: 0; }
+  .lede strong { color: var(--ink); font-weight: 600; }
+  .hero-meta { margin-top: 26px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill { font-size: 13px; color: var(--muted); border: 1px solid var(--line-strong); padding: 5px 12px; border-radius: 999px; background: var(--surface); }
+
+  .meter { display: flex; height: 48px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 24px 0 0; }
+  .meter > div { display: flex; align-items: center; justify-content: center; font-size: 13.5px; font-weight: 600; padding: 0 8px; text-align: center; }
+  .meter-cap { font-size: 13px; color: var(--muted); text-align: center; margin: 10px 0 0; }
+  .legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 18px; }
+  .leg { display: flex; gap: 10px; }
+  .leg .dot { flex: 0 0 11px; width: 11px; height: 11px; border-radius: 50%; margin-top: 7px; }
+  .leg p { margin: 0; font-size: 14.5px; color: var(--text); }
+  .leg .lt { color: var(--ink); font-weight: 600; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 22px 0 0; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent, var(--line)); border-radius: var(--radius); padding: 16px 18px; }
+  .card h3 { font-size: 16px; margin: 0 0 6px; }
+  .card p { margin: 0; font-size: 14.5px; color: var(--text); }
+  .card code { font-size: 0.82em; }
+
+  .callout {
+    border: 1px solid color-mix(in srgb, var(--c-blue) 30%, transparent);
+    background: color-mix(in srgb, var(--c-blue) 8%, var(--surface));
+    border-left: 4px solid var(--c-blue); border-radius: 12px; padding: 16px 20px; margin: 22px 0 0;
+  }
+  .callout .c-title { font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .callout p { margin: 0; font-size: 15px; color: var(--text); }
+
+  .dd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 22px 0 0; }
+  .dd { border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 12px; padding: 16px 20px; background: var(--surface); }
+  .dd h3 { font-size: 15px; margin: 0 0 10px; }
+  .dd ul { list-style: none; margin: 0; padding: 0; }
+  .dd li { font-size: 14.5px; color: var(--text); padding: 5px 0 5px 24px; position: relative; }
+  .dd li::before { position: absolute; left: 0; top: 5px; font-weight: 600; }
+  .dd.do li::before { content: "\2713"; color: var(--c-teal); }
+  .dd.dont li::before { content: "\2715"; color: var(--c-pink); }
+
+  footer { border-top: 1px solid var(--line); margin-top: 10px; padding: 40px 0 64px; color: var(--muted); font-size: 14.5px; }
+  footer strong { color: var(--ink); }
+  footer p { margin: 0 0 10px; }
+
+  @media (max-width: 640px) {
+    header.hero h1 { font-size: 34px; }
+    .lede { font-size: 18px; }
+    .nav-inner a.link:not(.cta) { display: none; }
+    .dd-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <span class="nav-brand"><span class="nav-dot"></span>Claude Code · at a glance</span>
+    <a class="link" href="#budget">Budget</a>
+    <a class="link" href="#claudemd">CLAUDE.md</a>
+    <a class="link" href="#obsidian">Obsidian</a>
+    <a class="link" href="#cowork">Cowork</a>
+    <a class="link" href="#features">Features</a>
+    <a class="link cta" href="index.html">Full guide &rarr;</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">The one-screen version</p>
+    <h1>Claude Code, at a glance</h1>
+    <p class="lede">The <a href="index.html">full guide</a> walks the setup end to end. This is the cheat sheet — the handful of habits that separate <em>using</em> Claude Code from getting the most out of it. The thread through all of them: <strong>context is the budget</strong>. Everything in the window competes with the task, so spend it deliberately.</p>
+    <div class="hero-meta">
+      <span class="pill">Context · CLAUDE.md · Obsidian · Cowork</span>
+      <span class="pill">~5-minute read</span>
+      <span class="pill">Pairs with the full guide</span>
+    </div>
+  </div>
+</header>
+
+<section id="budget">
+  <div class="wrap">
+    <p class="kicker">The one mental model</p>
+    <h2>Context is one budget — everything shares it</h2>
+    <p>One window holds it all. What you load <em>always-on</em> is billed every single turn; what you pull in <em>on demand</em> still competes with the work itself. Keep the scaffolding small so the task has room.</p>
+    <div class="meter">
+      <div style="flex: 0 0 20%; background: color-mix(in srgb, var(--c-coral) 16%, var(--surface)); color: var(--c-coral); border-right: 1px solid var(--line);">Always on</div>
+      <div style="flex: 0 0 30%; background: color-mix(in srgb, var(--c-teal) 16%, var(--surface)); color: var(--c-teal); border-right: 1px solid var(--line);">On demand</div>
+      <div style="flex: 1; background: var(--surface-2); color: var(--muted);">Task headroom</div>
+    </div>
+    <p class="meter-cap">Illustrative proportions &mdash; real token budgets vary by model and session.</p>
+    <div class="legend">
+      <div class="leg"><span class="dot" style="background: var(--c-coral);"></span><p><span class="lt">Always loaded</span> &mdash; CLAUDE.md + memory. Billed every turn, so keep it small.</p></div>
+      <div class="leg"><span class="dot" style="background: var(--c-teal);"></span><p><span class="lt">On demand</span> &mdash; vault, MCP, skills, subagents. Pulled in only when needed.</p></div>
+      <div class="leg"><span class="dot" style="background: var(--c-gray);"></span><p><span class="lt">Task headroom</span> &mdash; the actual work. Clear and compact to protect it.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="claudemd">
+  <div class="wrap">
+    <p class="kicker">Keep CLAUDE.md optimal</p>
+    <h2>Treat it as a budget, not a junk drawer</h2>
+    <div class="grid" style="--accent: var(--c-purple);">
+      <div class="card"><h3>Keep it lean</h3><p>Every token competes with the task. Trim ruthlessly.</p></div>
+      <div class="card"><h3>Layer it</h3><p>Global &rarr; project &rarr; subfolder. Specific overrides general.</p></div>
+      <div class="card"><h3>Compose with <code>@</code>-imports</h3><p>Load specialized frames only where they're relevant.</p></div>
+      <div class="card"><h3>Write imperatives</h3><p>Testable rules, not vibes. &ldquo;Cite endpoint paths,&rdquo; not &ldquo;be specific.&rdquo;</p></div>
+      <div class="card"><h3>Knowledge &ne; instructions</h3><p>Facts live in the vault. CLAUDE.md is the wiring.</p></div>
+      <div class="card"><h3>Quick-add with <code>#</code></h3><p>Type <code>#</code> mid-session to append a line straight to CLAUDE.md.</p></div>
+      <div class="card"><h3>Prune on a clock</h3><p>Stale rules cause drift. Re-read monthly; delete what's dead.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="obsidian">
+  <div class="wrap">
+    <p class="kicker">Claude Code + Obsidian</p>
+    <h2>The vault is the memory; CLAUDE.md is the wire</h2>
+    <div class="grid" style="--accent: var(--c-teal);">
+      <div class="card"><h3>Vault = knowledge store</h3><p>Durable notes; CLAUDE.md just points the session at them.</p></div>
+      <div class="card"><h3>Prefer the MCP</h3><p>Frontmatter-safe and AST-aware. Beats raw file edits.</p></div>
+      <div class="card"><h3>Read-first</h3><p>Scan the vault before answering. Don't re-derive what's written.</p></div>
+      <div class="card"><h3>Route on capture</h3><p>Skill vs MCP vs note vs CLAUDE.md &mdash; place it where it triggers.</p></div>
+      <div class="card"><h3>Memory is a pointer</h3><p>An index of who and where &mdash; not a second knowledge store.</p></div>
+      <div class="card"><h3>Watch the dates</h3><p>Notes go stale. Verify the feature still exists before acting.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="cowork">
+  <div class="wrap">
+    <p class="kicker">Cowork</p>
+    <h2>Claude Code's power, for knowledge work</h2>
+    <p>Cowork is Claude Code for people who don't write code &mdash; agentic help for documents, files, and research.</p>
+    <div class="grid" style="--accent: var(--c-coral);">
+      <div class="card"><h3>Built for non-coders</h3><p>Agentic help for documents, files, and research &mdash; no code.</p></div>
+      <div class="card"><h3>Plugins bundle the job</h3><p>Skills, connectors, slash commands, and sub-agents per role.</p></div>
+      <div class="card"><h3>Connect your role's tools</h3><p>CRMs, trackers, warehouses, design tools &mdash; wired in via MCP.</p></div>
+    </div>
+    <div class="callout">
+      <div class="c-title">Start here</div>
+      <p>11 open-source plugins ship today &mdash; Sales, Finance, Legal, Marketing, Support, Product, Research and more. Run <code>/setup-cowork</code> for guided, role-matched setup.</p>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <p class="kicker">Worth knowing</p>
+    <h2>Power features that protect the budget</h2>
+    <div class="grid" style="--accent: var(--c-gray);">
+      <div class="card"><h3>Subagents</h3><p>Fan out big searches; keep the main context clean.</p></div>
+      <div class="card"><h3>Plan mode</h3><p>Design before you edit. <code>Shift+Tab</code> cycles the modes.</p></div>
+      <div class="card"><h3>Skills &amp; slash commands</h3><p>Package repeatable workflows you run by name.</p></div>
+      <div class="card"><h3>Hooks</h3><p>Automate on events &mdash; the harness runs them, not the model.</p></div>
+      <div class="card"><h3>MCP servers</h3><p>Connect any external tool or data source.</p></div>
+      <div class="card"><h3><code>/clear</code> &amp; <code>/compact</code></h3><p>Reset between tasks, or summarize a long one.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="ref">
+  <div class="wrap">
+    <p class="kicker">Quick reference</p>
+    <h2>Habits, distilled</h2>
+    <div class="dd-grid">
+      <div class="dd do" style="--accent: var(--c-teal);">
+        <h3>Do</h3>
+        <ul>
+          <li>Start from <code>/init</code> or a tight CLAUDE.md</li>
+          <li><code>/clear</code> between unrelated tasks</li>
+          <li>Knowledge to the vault, rules to CLAUDE.md</li>
+          <li>Fan out big searches to subagents</li>
+          <li>Verify before you assert</li>
+        </ul>
+      </div>
+      <div class="dd dont" style="--accent: var(--c-pink);">
+        <h3>Don't</h3>
+        <ul>
+          <li>Dump everything into one giant CLAUDE.md</li>
+          <li>Let one session sprawl across many jobs</li>
+          <li>Duplicate vault knowledge into memory</li>
+          <li>Paste huge files a subagent could summarize</li>
+          <li>Trust stale notes without checking</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Context is the budget.</strong> Keep the always-on layer small, pull the rest in on demand, and protect the room the task runs in. That one habit is most of the other 80%.</p>
+    <p>The deep version lives in the <a href="index.html">full setup guide</a> &middot; run <code>/help</code> any time.</p>
+    <p style="margin-top:14px; font-size:13px;">Verified against <code>code.claude.com/docs</code> and the Cowork plugin docs on 23 June 2026. Claude Code ships quickly &mdash; <code>/help</code> is the ground truth on your installed version.</p>
+  </div>
+</footer>
+
+</body>
+</html>
