@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code, to the fullest — a setup guide</title>
+<style>
+  :root {
+    --bg: #faf9f6;
+    --surface: #ffffff;
+    --surface-2: #f4f2ec;
+    --ink: #1a1a18;
+    --text: #46453f;
+    --muted: #76746c;
+    --line: rgba(26,26,24,0.10);
+    --line-strong: rgba(26,26,24,0.16);
+    --brand: #c2602f;
+    --brand-soft: #d97757;
+    --code-bg: #f4f2ec;
+    --radius: 14px;
+    --maxw: 940px;
+    --c-gray: #5f5e5a;
+    --c-teal: #0f6e56;
+    --c-purple: #534ab7;
+    --c-coral: #d85a30;
+    --c-pink: #993556;
+    --c-blue: #185fa5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1916;
+      --surface: #222019;
+      --surface-2: #2a281f;
+      --ink: #f3f1ea;
+      --text: #cfccc2;
+      --muted: #9b988d;
+      --line: rgba(255,255,255,0.10);
+      --line-strong: rgba(255,255,255,0.16);
+      --brand: #e0895f;
+      --brand-soft: #d97757;
+      --code-bg: #161510;
+      --c-gray: #b4b2a9;
+      --c-teal: #5dcaa5;
+      --c-purple: #afa9ec;
+      --c-coral: #f0997b;
+      --c-pink: #ed93b1;
+      --c-blue: #85b7eb;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { color: var(--ink); font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
+  a { color: var(--brand); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.86em;
+    background: var(--code-bg);
+    padding: 0.12em 0.4em;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    overflow-x: auto;
+    line-height: 1.55;
+  }
+  pre code { background: none; border: none; padding: 0; font-size: 14.5px; }
+
+  /* nav */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(140%) blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    max-width: var(--maxw); margin: 0 auto; padding: 12px 24px;
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  }
+  .nav-brand { font-weight: 600; color: var(--ink); margin-right: auto; display: flex; align-items: center; gap: 9px; }
+  .nav-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--brand-soft); display: inline-block; }
+  .nav-inner a.link { color: var(--muted); font-size: 14.5px; }
+  .nav-inner a.link:hover { color: var(--ink); text-decoration: none; }
+
+  /* layout */
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+  section { scroll-margin-top: 72px; padding: 30px 0; border-top: 1px solid var(--line); }
+  section:first-of-type { border-top: none; }
+  .kicker {
+    text-transform: uppercase; letter-spacing: 0.13em; font-size: 12.5px; font-weight: 600;
+    color: var(--brand); margin: 0 0 10px;
+  }
+  .sec-num { color: var(--muted); font-variant-numeric: tabular-nums; font-weight: 500; }
+
+  /* hero */
+  header.hero { padding: 64px 0 30px; }
+  header.hero h1 { font-size: 46px; margin: 0 0 18px; }
+  .lede { font-size: 21px; color: var(--text); max-width: 720px; margin: 0; }
+  .lede strong { color: var(--ink); font-weight: 600; }
+  .hero-meta { margin-top: 26px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill {
+    font-size: 13px; color: var(--muted); border: 1px solid var(--line-strong);
+    padding: 5px 12px; border-radius: 999px; background: var(--surface);
+  }
+
+  /* the stack */
+  .stack { display: flex; flex-direction: column; gap: 10px; margin: 26px 0 6px; }
+  .band {
+    display: flex; align-items: center; gap: 16px;
+    background: color-mix(in srgb, var(--accent) 11%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 15px 20px;
+  }
+  .band .b-main { flex: 1; }
+  .band .b-title { color: var(--ink); font-weight: 600; font-size: 17px; }
+  .band .b-sub { color: var(--muted); font-size: 14.5px; margin-top: 2px; }
+  .band .b-tag {
+    font-size: 12.5px; font-weight: 600; white-space: nowrap;
+    color: var(--accent);
+  }
+
+  /* cards + grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 18px 0; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .card h3 { font-size: 16px; margin: 0 0 6px; }
+  .card p { margin: 0; font-size: 15px; color: var(--text); }
+
+  /* tables */
+  .table-wrap { overflow-x: auto; margin: 18px 0; border: 1px solid var(--line); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; font-size: 15.5px; }
+  th, td { text-align: left; padding: 12px 16px; vertical-align: top; border-bottom: 1px solid var(--line); }
+  th { background: var(--surface-2); color: var(--muted); font-weight: 600; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.06em; }
+  tr:last-child td { border-bottom: none; }
+  td:first-child { white-space: nowrap; color: var(--ink); font-weight: 500; }
+  td code, th code { white-space: nowrap; }
+
+  /* callout */
+  .callout {
+    border: 1px solid color-mix(in srgb, var(--accent, var(--brand)) 30%, transparent);
+    background: color-mix(in srgb, var(--accent, var(--brand)) 8%, var(--surface));
+    border-left: 4px solid var(--accent, var(--brand));
+    border-radius: 12px; padding: 16px 20px; margin: 20px 0;
+  }
+  .callout .c-title { font-weight: 600; color: var(--ink); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .callout p { margin: 6px 0 0; font-size: 15.5px; }
+  .callout p:first-of-type { margin-top: 0; }
+
+  /* learning path timeline */
+  .path { list-style: none; padding: 0; margin: 20px 0 0; }
+  .path li { position: relative; padding: 0 0 22px 52px; }
+  .path li:not(:last-child)::before {
+    content: ""; position: absolute; left: 17px; top: 30px; bottom: -4px; width: 2px; background: var(--line-strong);
+  }
+  .path .step-n {
+    position: absolute; left: 0; top: 0; width: 36px; height: 36px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--brand-soft); color: var(--brand);
+    display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 15px;
+  }
+  .path .step-t { color: var(--ink); font-weight: 600; }
+  .path .step-d { color: var(--text); font-size: 15.5px; margin-top: 2px; }
+
+  p { margin: 14px 0; }
+  section h2 { font-size: 27px; margin: 4px 0 6px; }
+  section > .wrap > p:first-of-type { margin-top: 8px; }
+  ul.tight { margin: 12px 0; padding-left: 22px; }
+  ul.tight li { margin: 7px 0; }
+
+  /* OS install tabs */
+  .tabs { margin: 24px 0 8px; }
+  .tablist { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+  .tab-btn {
+    appearance: none; background: none; border: none; cursor: pointer; font: inherit;
+    font-size: 16px; font-weight: 500; color: var(--muted);
+    padding: 11px 22px; border-bottom: 2px solid transparent; margin-bottom: -1px;
+    border-radius: 10px 10px 0 0; transition: color .12s, background .12s;
+  }
+  .tab-btn:hover { color: var(--ink); background: var(--surface-2); }
+  .tab-btn[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--brand); }
+  .tab-panel { padding: 24px 0 4px; }
+  .tab-panel[hidden] { display: none; }
+  .req {
+    font-size: 14px; color: var(--muted); background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: 10px; padding: 11px 15px; margin: 0 0 22px;
+  }
+  .req strong { color: var(--ink); font-weight: 600; }
+  .istep { position: relative; padding-left: 42px; margin: 0 0 22px; }
+  .istep-n {
+    position: absolute; left: 0; top: -1px; min-width: 28px; height: 28px; padding: 0 7px; border-radius: 14px;
+    background: color-mix(in srgb, var(--brand) 14%, var(--surface)); color: var(--brand);
+    border: 1px solid color-mix(in srgb, var(--brand) 35%, transparent);
+    display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13.5px;
+  }
+  .istep h4 { margin: 2px 0 8px; font-size: 16px; color: var(--ink); font-weight: 600; }
+  .istep p { margin: 8px 0; font-size: 15px; }
+  .istep pre, .req + .istep pre { margin: 8px 0; }
+  details.more {
+    border: 1px solid var(--line); border-radius: 10px; padding: 0 16px; margin: 10px 0 0; background: var(--surface);
+  }
+  details.more > summary {
+    cursor: pointer; padding: 12px 2px; font-size: 14.5px; font-weight: 500; color: var(--brand); list-style: none;
+  }
+  details.more > summary::-webkit-details-marker { display: none; }
+  details.more > summary::before { content: "+\00a0"; font-weight: 600; }
+  details.more[open] > summary::before { content: "\2212\00a0"; }
+  details.more[open] { padding-bottom: 14px; }
+  details.more pre { font-size: 13px; }
+  details.more p { font-size: 14.5px; margin: 10px 0 6px; }
+  .choice { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 6px 0 24px; }
+  .choice .opt { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; background: var(--surface); }
+  .choice .opt.rec { border-color: color-mix(in srgb, var(--brand) 45%, transparent); background: color-mix(in srgb, var(--brand) 5%, var(--surface)); }
+  .choice .opt h4 { margin: 4px 0 4px; font-size: 15.5px; color: var(--ink); font-weight: 600; }
+  .choice .opt .badge { font-size: 11.5px; font-weight: 600; color: var(--brand); text-transform: uppercase; letter-spacing: .06em; }
+  .choice .opt p { margin: 4px 0 0; font-size: 14px; color: var(--text); }
+  @media (max-width: 640px) { .choice { grid-template-columns: 1fr; } }
+  .tab-panel > h4 { font-size: 16px; color: var(--ink); font-weight: 600; margin: 24px 0 8px; }
+  .tab-panel > h4:first-of-type { margin-top: 4px; }
+  .tab-panel > p:first-child { margin-top: 0; }
+
+  footer { border-top: 1px solid var(--line); margin-top: 10px; padding: 40px 0 64px; color: var(--muted); font-size: 14.5px; }
+  footer strong { color: var(--ink); }
+
+  @media (max-width: 640px) {
+    header.hero h1 { font-size: 34px; }
+    .lede { font-size: 18px; }
+    .nav-inner a.link { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <span class="nav-brand"><span class="nav-dot"></span>Claude Code · setup &amp; mastery</span>
+    <a class="link" href="#install">Install</a>
+    <a class="link" href="#loop">The loop</a>
+    <a class="link" href="#context">Context</a>
+    <a class="link" href="#tools">Tools</a>
+    <a class="link" href="#reuse">Reuse</a>
+    <a class="link" href="#scale">Scale</a>
+    <a class="link" href="#essentials">Essentials</a>
+    <a class="link" href="#path">Path</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">A walkthrough for getting the full power</p>
+    <h1>Claude Code, to the fullest</h1>
+    <p class="lede">Claude Code isn't powerful because of the model. It's powerful because of <strong>what you put around it</strong> — the context it reads, the tools it can reach, the workflows you make repeatable, and the agents you scale into. Type questions into it and you're using ~20%. Here's the other 80%.</p>
+    <div class="hero-meta">
+      <span class="pill">Terminal · Desktop · Web · IDE</span>
+      <span class="pill">~10 min to install</span>
+      <span class="pill">Compounds over weeks</span>
+    </div>
+  </div>
+</header>
+
+<section id="stack">
+  <div class="wrap">
+    <p class="kicker">The mental model</p>
+    <h2>Four levers of power, stacked</h2>
+    <p>Everything below maps to one of these layers. You add them over time — each one multiplies the last.</p>
+    <div class="stack">
+      <div class="band" style="--accent: var(--c-gray)">
+        <div class="b-main">
+          <div class="b-title">Claude Code — the agent</div>
+          <div class="b-sub">Reads files, runs commands, edits code</div>
+        </div>
+        <div class="b-tag">start here</div>
+      </div>
+      <div class="band" style="--accent: var(--c-teal)">
+        <div class="b-main">
+          <div class="b-title">Context</div>
+          <div class="b-sub">CLAUDE.md · memory · Obsidian vault</div>
+        </div>
+        <div class="b-tag">+ knows you</div>
+      </div>
+      <div class="band" style="--accent: var(--c-purple)">
+        <div class="b-main">
+          <div class="b-title">Tools</div>
+          <div class="b-sub">MCP servers — GitHub, databases, Slack, docs</div>
+        </div>
+        <div class="b-tag">+ reaches out</div>
+      </div>
+      <div class="band" style="--accent: var(--c-coral)">
+        <div class="b-main">
+          <div class="b-title">Reuse</div>
+          <div class="b-sub">Skills · custom slash commands · hooks</div>
+        </div>
+        <div class="b-tag">+ repeatable</div>
+      </div>
+      <div class="band" style="--accent: var(--c-pink)">
+        <div class="b-main">
+          <div class="b-title">Scale</div>
+          <div class="b-sub">Subagents · multi-agent workflows</div>
+        </div>
+        <div class="b-tag">+ parallel</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <p class="kicker"><span class="sec-num">01</span> &nbsp;Foundation</p>
+    <h2>Install and authenticate</h2>
+    <p>Pick your OS for the full path — install, first run, log in, verify. The <strong>native installer</strong> is recommended everywhere: it auto-updates and needs no Node.js. Other methods (Homebrew, WinGet, package managers, npm) sit under "other install methods."</p>
+
+    <div class="tabs">
+      <div class="tablist" role="tablist" aria-label="Operating system">
+        <button class="tab-btn" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="true">macOS</button>
+        <button class="tab-btn" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="false">Windows</button>
+        <button class="tab-btn" role="tab" id="tab-linux" aria-controls="panel-linux" aria-selected="false">Linux</button>
+      </div>
+
+      <div class="tab-panel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac">
+        <p class="req"><strong>Needs:</strong> macOS 13+ · Apple Silicon or Intel · 4&nbsp;GB RAM. Node.js 18+ only if you pick the npm path.</p>
+        <div class="istep"><span class="istep-n">1</span>
+          <h4>Install (native installer)</h4>
+          <pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+          <p>Installs to <code>~/.local/bin/claude</code> and updates itself in the background.</p>
+          <details class="more"><summary>Other install methods</summary>
+            <p><strong>Homebrew</strong> (manual upgrades):</p>
+            <pre><code>brew install --cask claude-code</code></pre>
+            <p><strong>npm</strong> — needs Node 18+ (<code>brew install node</code> first):</p>
+            <pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
+          </details>
+        </div>
+        <div class="istep"><span class="istep-n">2</span>
+          <h4>Start it and log in</h4>
+          <pre><code>cd ~/your-project
+claude          # launches the session
+/login          # opens the browser to authenticate</code></pre>
+          <p>You need a <strong>Claude Pro, Max, Team, or Enterprise</strong> plan, or an <strong>Anthropic Console</strong> (API) account — the free plan doesn't include Claude Code. If the browser doesn't open, press <code>c</code> to copy the login URL.</p>
+        </div>
+        <div class="istep"><span class="istep-n">3</span>
+          <h4>Verify</h4>
+          <pre><code>claude --version
+claude doctor   # checks install, config, dependencies</code></pre>
+        </div>
+        <div class="callout" style="--accent: var(--c-amber)">
+          <div class="c-title">If <code>claude: command not found</code></div>
+          <p>Add <code>~/.local/bin</code> to your PATH, then reload your shell:</p>
+          <pre><code>echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc</code></pre>
+        </div>
+        <details class="more"><summary>Update &amp; uninstall</summary>
+          <p><strong>Update:</strong> automatic; force it with <code>claude update</code>.</p>
+          <p><strong>Uninstall (native):</strong></p>
+          <pre><code>rm -f ~/.local/bin/claude
+rm -rf ~/.local/share/claude</code></pre>
+        </details>
+      </div>
+
+      <div class="tab-panel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" hidden>
+        <p class="req"><strong>Needs:</strong> Windows 10 (1809+) or Server 2019+ · 64-bit · 4&nbsp;GB RAM. Node.js 18+ only for the npm path.</p>
+        <p>First, one real decision:</p>
+        <div class="choice">
+          <div class="opt rec">
+            <div class="badge">Recommended for most</div>
+            <h4>Native Windows</h4>
+            <p>Projects live in <code>C:\</code>. Simplest setup. Runs in PowerShell, or Bash via Git for Windows. No sandboxing.</p>
+          </div>
+          <div class="opt">
+            <div class="badge">Power users</div>
+            <h4>WSL2 (Linux)</h4>
+            <p>Pick this for Linux toolchains, Docker, or sandboxing. One extra setup step, then follow the Linux path.</p>
+          </div>
+        </div>
+        <div class="istep"><span class="istep-n">1</span>
+          <h4>Install — native, in PowerShell</h4>
+          <pre><code>irm https://claude.ai/install.ps1 | iex</code></pre>
+          <p>Don't run as Administrator. In <strong>CMD</strong> instead of PowerShell, use:</p>
+          <pre><code>curl -fsSL https://claude.ai/install.cmd -o install.cmd &amp;&amp; install.cmd &amp;&amp; del install.cmd</code></pre>
+          <p>Optional but recommended: install <a href="https://git-scm.com/downloads/win">Git for Windows</a> so Claude can use the Bash tool; without it, it falls back to PowerShell.</p>
+          <details class="more"><summary>Other install methods</summary>
+            <p><strong>WinGet</strong> (manual upgrades):</p>
+            <pre><code>winget install Anthropic.ClaudeCode</code></pre>
+            <p><strong>npm</strong> — needs Node 18+:</p>
+            <pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
+          </details>
+        </div>
+        <div class="istep"><span class="istep-n">1·WSL</span>
+          <h4>Or install via WSL2</h4>
+          <p>In an <strong>admin PowerShell</strong>, enable WSL2 and reboot:</p>
+          <pre><code>wsl --install</code></pre>
+          <p>Then open the Ubuntu/WSL terminal and run the Linux installer. Keep projects in the Linux filesystem (<code>~/project</code>, not <code>/mnt/c/...</code>) for speed:</p>
+          <pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+        </div>
+        <div class="istep"><span class="istep-n">2</span>
+          <h4>Start it and log in</h4>
+          <pre><code>cd C:\path\to\your\project
+claude
+/login</code></pre>
+          <p>Needs a <strong>Claude Pro/Max/Team/Enterprise</strong> plan or <strong>Anthropic Console</strong> account. Press <code>c</code> to copy the login URL if the browser doesn't open.</p>
+        </div>
+        <div class="istep"><span class="istep-n">3</span>
+          <h4>Verify</h4>
+          <pre><code>claude --version
+claude doctor</code></pre>
+        </div>
+        <div class="callout" style="--accent: var(--c-amber)">
+          <div class="c-title">Two common Windows snags</div>
+          <p><code>'claude' is not recognized</code> → add <code>%USERPROFILE%\.local\bin</code> to your user PATH (System settings → Environment Variables), then restart the terminal.</p>
+          <p><code>'irm' is not recognized</code> → you're in CMD, not PowerShell. Open PowerShell, or use the CMD command above.</p>
+        </div>
+        <details class="more"><summary>Update &amp; uninstall</summary>
+          <p><strong>Update:</strong> automatic; force with <code>claude update</code>.</p>
+          <p><strong>Uninstall (native, PowerShell):</strong></p>
+          <pre><code>Remove-Item "$env:USERPROFILE\.local\bin\claude.exe" -Force
+Remove-Item "$env:USERPROFILE\.local\share\claude" -Recurse -Force</code></pre>
+        </details>
+      </div>
+
+      <div class="tab-panel" role="tabpanel" id="panel-linux" aria-labelledby="tab-linux" hidden>
+        <p class="req"><strong>Needs:</strong> Ubuntu 20.04+, Debian 10+, Fedora/RHEL, or Alpine 3.19+ · 4&nbsp;GB RAM. Node.js 18+ only for the npm path.</p>
+        <div class="istep"><span class="istep-n">1</span>
+          <h4>Install (native installer)</h4>
+          <pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+          <p>Installs to <code>~/.local/bin/claude</code> and auto-updates. Works across distributions.</p>
+          <details class="more"><summary>Other install methods — apt · dnf · apk · npm</summary>
+            <p><strong>Debian / Ubuntu (apt):</strong></p>
+            <pre><code>sudo install -d -m 0755 /etc/apt/keyrings
+sudo curl -fsSL https://downloads.claude.ai/keys/claude-code.asc \
+  -o /etc/apt/keyrings/claude-code.asc
+echo "deb [signed-by=/etc/apt/keyrings/claude-code.asc] https://downloads.claude.ai/claude-code/apt/stable stable main" \
+  | sudo tee /etc/apt/sources.list.d/claude-code.list
+sudo apt update &amp;&amp; sudo apt install claude-code</code></pre>
+            <p><strong>Fedora / RHEL (dnf):</strong> add the <code>claude-code</code> repo at <code>downloads.claude.ai/claude-code/rpm/stable</code>, then <code>sudo dnf install claude-code</code>.</p>
+            <p><strong>Alpine (apk):</strong> first <code>apk add libgcc libstdc++ ripgrep</code> and set <code>USE_BUILTIN_RIPGREP=0</code>, then add the apk repo and <code>apk add claude-code</code>.</p>
+            <p><strong>npm</strong> — needs Node 18+ (e.g. via nvm):</p>
+            <pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
+          </details>
+        </div>
+        <div class="istep"><span class="istep-n">2</span>
+          <h4>Start it and log in</h4>
+          <pre><code>cd ~/your-project
+claude
+/login</code></pre>
+          <p>Needs a <strong>Claude Pro/Max/Team/Enterprise</strong> plan or <strong>Anthropic Console</strong> account. Over SSH, the browser opens on your local machine — copy the URL with <code>c</code> if needed.</p>
+        </div>
+        <div class="istep"><span class="istep-n">3</span>
+          <h4>Verify</h4>
+          <pre><code>claude --version
+claude doctor</code></pre>
+        </div>
+        <div class="callout" style="--accent: var(--c-amber)">
+          <div class="c-title">If <code>claude: command not found</code></div>
+          <p>Add <code>~/.local/bin</code> to your PATH (use <code>~/.bashrc</code> or <code>~/.zshrc</code> to match your shell):</p>
+          <pre><code>echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc</code></pre>
+        </div>
+        <details class="more"><summary>Update &amp; uninstall</summary>
+          <p><strong>Update:</strong> automatic (or <code>claude update</code>); for package installs use your manager — <code>apt upgrade</code>, <code>dnf upgrade</code>, <code>apk upgrade</code>.</p>
+          <p><strong>Uninstall (native):</strong></p>
+          <pre><code>rm -f ~/.local/bin/claude
+rm -rf ~/.local/share/claude</code></pre>
+        </details>
+      </div>
+    </div>
+
+    <p>Whichever OS: once <code>claude</code> launches, type <code>/help</code> to see every command, and pick a billing model — a flat <strong>Pro/Max subscription</strong> (best for heavy interactive use) or a pay-per-token <strong>API key</strong> (better for spiky use or CI). Start in the terminal, then add the VS Code or JetBrains extension once you're comfortable.</p>
+  </div>
+</section>
+
+<section id="loop">
+  <div class="wrap">
+    <p class="kicker"><span class="sec-num">02</span> &nbsp;Week one</p>
+    <h2>Learn the loop</h2>
+    <p>Before any advanced setup, get fluent in the six things you'll use every session. This <em>is</em> using it to the fullest for the first week.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Skill</th><th>How</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td>Plan before doing</td><td><code>/plan</code> &nbsp;(or cycle modes with <code>shift+tab</code>)</td><td>Claude proposes an approach and waits for approval before touching files. The single biggest quality lever.</td></tr>
+          <tr><td>Reference files</td><td><code>@path/to/file</code></td><td>Pulls a file into context instead of making Claude guess. <code>@</code> autocompletes.</td></tr>
+          <tr><td>Manage context</td><td><code>/clear</code>, <code>/compact</code></td><td>A bloated context makes Claude slower and dumber. Clear between unrelated tasks.</td></tr>
+          <tr><td>Control permissions</td><td><code>/permissions</code></td><td>Default asks before edits. <code>acceptEdits</code> stops asking. Reserve "bypass" for sandboxes.</td></tr>
+          <tr><td>Undo</td><td><code>/rewind</code>, <code>/resume</code></td><td>Roll back to an earlier checkpoint, or reopen a past session.</td></tr>
+          <tr><td>Think harder</td><td>say "think" / "ultrathink"</td><td>Escalates reasoning budget for genuinely hard problems. Don't use it for everything — it's slower.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>On models:</strong> <strong>Opus</strong> for hard work, <strong>Sonnet</strong> as the faster/cheaper default for routine edits, <strong>Haiku</strong> for trivial mechanical tasks, <strong>Fable 5</strong> as the newest flagship. A <strong>fast mode</strong> (<code>/fast</code>) runs Opus with faster output at higher cost — good when you iterate live. Match the model to the task; don't run Opus to rename a variable. Switch with <code>/model</code>.</p>
+  </div>
+</section>
+
+<section id="context">
+  <div class="wrap">
+    <p class="kicker"><span class="sec-num">03</span> &nbsp;The highest-leverage move</p>
+    <h2>Give it a memory — <code>CLAUDE.md</code></h2>
+    <p>This is the difference between a generic assistant and one that knows your project. <code>CLAUDE.md</code> is plain markdown that Claude Code loads <strong>automatically</strong> at the start of every session. Put your conventions, architecture notes, "don't do X," and commands in it.</p>
+    <pre><code>/init   # scans your project and drafts a CLAUDE.md for you</code></pre>
+    <p>There's a hierarchy, and the files <strong>compose</strong> — they all load together, most-specific wins:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Location</th><th>Scope</th></tr></thead>
+        <tbody>
+          <tr><td><code>~/.claude/CLAUDE.md</code></td><td>You, everywhere — global preferences across all projects</td></tr>
+          <tr><td><code>&lt;repo&gt;/CLAUDE.md</code></td><td>This project — checked into git, shared with the team</td></tr>
+          <tr><td><code>&lt;repo&gt;/subdir/CLAUDE.md</code></td><td>A subfolder — loads when you work in that part of the tree</td></tr>
+          <tr><td><code>CLAUDE.local.md</code></td><td>Your personal, un-committed overrides for this repo</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>You can <code>@import</code> other files into a <code>CLAUDE.md</code> (e.g. <code>@docs/architecture.md</code>) to keep the main file lean while pulling in deeper context on demand. Manage it with <code>/memory</code>.</p>
+    <div class="callout" style="--accent: var(--c-teal)">
+      <div class="c-title">The discipline that pays off</div>
+      <p>Treat <code>CLAUDE.md</code> as a living file. Every time Claude gets something wrong because it lacked context, add the missing fact <em>to the file</em> instead of re-explaining it next session. It becomes your project's institutional memory.</p>
+    </div>
+  </div>
+</section>
+
+<section id="tools">
+  <div class="wrap">
+    <p class="kicker"><span class="sec-num">04</span> &nbsp;The biggest multiplier</p>
+    <h2>Connect your world — MCP servers</h2>
+    <p><strong>MCP (Model Context Protocol)</strong> is the plugin system. Each server gives Claude Code a new set of tools — read your database, search your docs, manage GitHub issues, post to Slack, query a knowledge vault.</p>
+    <pre><code>claude mcp add &lt;name&gt; -- &lt;command to run the server&gt;
+claude mcp list
+/mcp                # check connection status mid-session</code></pre>
+    <p>Servers scope to <strong>local</strong> (just you), <strong>project</strong> (committed via <code>.mcp.json</code> so your whole team gets them), or <strong>user</strong> (all your projects). Transports are stdio, SSE, or HTTP.</p>
+
+    <h3 style="margin-top:26px; font-size:19px;">Obsidian as the persistent knowledge layer</h3>
+    <p>This is the pattern worth copying. Obsidian is a local-first markdown notes app; pointing an MCP server at your vault gives Claude Code a <strong>durable, searchable knowledge base that lives outside any single conversation</strong>.</p>
+    <pre><code>claude mcp add-json obsidian --scope user \
+  '{"type":"stdio","command":"npx",
+    "args":["-y","@bitbonsai/mcpvault@latest","/path/to/YourVault"]}'</code></pre>
+    <p>The server is pure file-based — it doesn't even need the Obsidian app running, just the folder of markdown files (Node ≥ 18). Why it's powerful:</p>
+    <ul class="tight">
+      <li><strong>Memory that survives <code>/clear</code> and new sessions.</strong> Conversations are ephemeral; a vault note is forever. Claude writes findings to the vault and reads them back weeks later.</li>
+      <li><strong>A second brain you both edit.</strong> You write notes normally; Claude searches them, cites them with clickable links, and adds new notes in your conventions.</li>
+      <li><strong>Linking builds a knowledge graph.</strong> Obsidian's <code>[[wiki-links]]</code> let Claude connect related notes and synthesize across sources — not just retrieve one file.</li>
+    </ul>
+    <div class="callout" style="--accent: var(--c-purple)">
+      <div class="c-title">The general principle</div>
+      <p>Give Claude a place to put durable knowledge, and a <code>CLAUDE.md</code> that tells it when to read and write there. That turns one-off help into compounding expertise.</p>
+    </div>
+
+    <h3 style="margin-top:26px; font-size:19px;">Other servers worth adding</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Server</th><th>Unlocks</th></tr></thead>
+        <tbody>
+          <tr><td>GitHub <span style="color:var(--muted);font-weight:400">(or the <code>gh</code> CLI)</span></td><td>Read/create PRs and issues, review diffs, manage releases</td></tr>
+          <tr><td>Playwright / browser</td><td>Drive a real browser — test your UI, scrape, verify a deploy visually</td></tr>
+          <tr><td>Postgres / database</td><td>Query your actual schema and data instead of guessing</td></tr>
+          <tr><td>Context7</td><td>Pulls <em>current</em> official docs so Claude isn't relying on stale training data</td></tr>
+          <tr><td>Sequential-thinking</td><td>Structured step-by-step reasoning for gnarly problems</td></tr>
+          <tr><td>Slack / Notion / Linear / Sentry</td><td>Reach into the rest of your work — read a ticket, post a summary, pull an error trace</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Browse the public MCP registry before building your own. Rule of thumb: <strong>add a server when "Claude can't see X" is the thing blocking you</strong> — not speculatively, since each one adds context overhead.</p>
+  </div>
+</section>
+
+<section id="reuse">
+  <div class="wrap">
+    <p class="kicker"><span class="sec-num">05</span> &nbsp;Package what repeats</p>
+    <h2>Make it repeatable</h2>
+    <p>Once you notice yourself typing the same instructions repeatedly, package them.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>Custom slash commands</h3>
+        <p>A markdown file becomes a command. Drop <code>review-pr.md</code> in <code>.claude/commands/</code> and it becomes <code>/review-pr</code>. Use <code>$ARGUMENTS</code>, <code>$1</code>, <code>$2</code> for parameters. <em>You explicitly run a saved prompt.</em></p>
+      </div>
+      <div class="card">
+        <h3>Skills</h3>
+        <p>A folder with a <code>SKILL.md</code> that Claude loads <strong>automatically when the task matches</strong>. Progressive disclosure keeps it cheap until needed. <em>Claude auto-invokes a packaged capability.</em></p>
+      </div>
+      <div class="card">
+        <h3>Hooks</h3>
+        <p>Shell commands the harness runs on events — <code>PreToolUse</code>, <code>PostToolUse</code>, <code>Stop</code>, <code>SessionStart</code> — set in <code>settings.json</code>. <em>Deterministic enforcement Claude can't forget.</em></p>
+      </div>
+    </div>
+    <p>The distinction that trips people up: a <strong>slash command</strong> is a prompt you run; a <strong>skill</strong> is a capability Claude invokes for you; a <strong>subagent</strong> is a separate Claude entirely. Hooks fire deterministically — that's their whole value. Use them for non-negotiables like "run the formatter after every edit" or "block edits to <code>prod.env</code>."</p>
+  </div>
+</section>
+
+<section id="scale">
+  <div class="wrap">
+    <p class="kicker"><span class="sec-num">06</span> &nbsp;When one conversation isn't enough</p>
+    <h2>Scale yourself</h2>
+    <p><strong>Subagents</strong> are separate Claude instances with their own context window, system prompt, tools, and model — markdown files in <code>.claude/agents/</code>, managed with <code>/agents</code>. Two reasons they're powerful:</p>
+    <ul class="tight">
+      <li><strong>Context isolation</strong> — a subagent can read 40 files and hand back a 3-line conclusion, keeping your main session clean.</li>
+      <li><strong>Specialization + parallelism</strong> — run a <code>code-reviewer</code>, a <code>test-writer</code>, and an <code>explorer</code> concurrently, each with its own instructions.</li>
+    </ul>
+    <p><strong>Multi-agent workflows</strong> are the newest tier: Claude orchestrates many subagents in the background against a deterministic script — fan out across files, verify findings adversarially, synthesize. Genuinely advanced and token-hungry; reach for it on large migrations, audits, or comprehensive reviews, not daily edits. Get fluent with single subagents first.</p>
+    <p><strong>Headless mode</strong> ties it to automation: <code>claude -p "your prompt"</code> runs non-interactively, and <code>--output-format json</code> makes it scriptable. Combined with the GitHub app (<code>@claude</code> mentions on PRs trigger it in CI), Claude Code becomes part of your pipeline, not just your terminal.</p>
+  </div>
+</section>
+
+<section id="essentials">
+  <div class="wrap">
+    <p class="kicker">Don't skip these</p>
+    <h2>Round out your setup</h2>
+    <p>Beyond the core loop, these six round out a setup you can lean on day to day. Three of them — your first real session, the IDE, and safety — are worth reading in week one.</p>
+
+    <div class="tabs">
+      <div class="tablist" role="tablist" aria-label="Essential topics">
+        <button class="tab-btn" role="tab" id="tab-first" aria-controls="panel-first" aria-selected="true">First session</button>
+        <button class="tab-btn" role="tab" id="tab-ide" aria-controls="panel-ide" aria-selected="false">IDE</button>
+        <button class="tab-btn" role="tab" id="tab-img" aria-controls="panel-img" aria-selected="false">Images</button>
+        <button class="tab-btn" role="tab" id="tab-claudemd" aria-controls="panel-claudemd" aria-selected="false">CLAUDE.md</button>
+        <button class="tab-btn" role="tab" id="tab-cost" aria-controls="panel-cost" aria-selected="false">Cost</button>
+        <button class="tab-btn" role="tab" id="tab-safety" aria-controls="panel-safety" aria-selected="false">Safety</button>
+      </div>
+
+      <div class="tab-panel" role="tabpanel" id="panel-first" aria-labelledby="tab-first">
+        <p>The fastest way to get the feel — 15 minutes in a repo you already know.</p>
+        <div class="istep"><span class="istep-n">1</span>
+          <h4>Point it at a real project</h4>
+          <pre><code>cd ~/some-project
+claude</code></pre>
+          <p>Then ask it to orient itself: <em>"Explain what this codebase does and how it's structured."</em> Watch it read files before answering — that's the agent loop in action.</p>
+        </div>
+        <div class="istep"><span class="istep-n">2</span>
+          <h4>Make one small change in plan mode</h4>
+          <p>Type <code>/plan</code>, then ask for something concrete: <em>"Add input validation to the signup form."</em> It proposes a plan and waits — you approve before it touches a file.</p>
+        </div>
+        <div class="istep"><span class="istep-n">3</span>
+          <h4>Review the diff, then decide</h4>
+          <p>It shows every change. Accept it, ask for revisions, or <code>/rewind</code> to undo. Nothing ships without you seeing it.</p>
+        </div>
+        <div class="istep"><span class="istep-n">4</span>
+          <h4>Capture what it got wrong</h4>
+          <p>If it missed a convention, tell it — then add that fact to <code>CLAUDE.md</code> so it's right next time.</p>
+        </div>
+        <div class="callout" style="--accent: var(--c-teal)">
+          <div class="c-title">The habit to build</div>
+          <p>Small, reviewable changes in plan mode beat one giant ask. You stay in the loop; it stays accurate.</p>
+        </div>
+      </div>
+
+      <div class="tab-panel" role="tabpanel" id="panel-ide" aria-labelledby="tab-ide" hidden>
+        <p>The terminal is the clearest place to start, but the VS Code and JetBrains extensions add inline diffs and selection context. Both still need the standalone CLI installed — they don't replace it.</p>
+        <h4>In VS Code</h4>
+        <p>Install the <strong>Claude Code</strong> extension from the Marketplace (or open <code>vscode:extension/anthropic.claude-code</code>). Launch it from the ✱ Spark icon in the editor toolbar or sidebar, or <code>Cmd/Ctrl+Shift+P</code> → "Claude Code". You get a side-by-side diff view, <code>@</code>-file mentions with line ranges, and plan review inside the editor.</p>
+        <h4>In JetBrains</h4>
+        <p>Install <strong>Claude Code [Beta]</strong> from the JetBrains Marketplace and restart the IDE. Open it with <code>Cmd+Esc</code> (Mac) or <code>Ctrl+Esc</code> (Windows/Linux). It shares your current selection and IDE diagnostics automatically.</p>
+        <div class="callout" style="--accent: var(--c-purple)">
+          <div class="c-title">Already in a terminal session?</div>
+          <p>Run <code>/ide</code> to connect a running terminal session to your open editor — you get the diff view and diagnostics without restarting.</p>
+        </div>
+      </div>
+
+      <div class="tab-panel" role="tabpanel" id="panel-img" aria-labelledby="tab-img" hidden>
+        <p>Claude Code is multimodal — hand it screenshots, mockups, diagrams, or PDFs, not just text.</p>
+        <ul class="tight">
+          <li><strong>Drag &amp; drop</strong> an image into the VS Code extension or the desktop app.</li>
+          <li><strong>Paste from the clipboard</strong> — <code>Ctrl+V</code> in most terminals (<code>Cmd+V</code> in iTerm2). Perfect for a quick screenshot of an error or a broken UI.</li>
+          <li><strong>Reference a file path</strong> in your prompt: <em>"Match this layout: ./design/home.png".</em></li>
+        </ul>
+        <h4>What it's good for</h4>
+        <ul class="tight">
+          <li>Paste a screenshot of a broken screen and ask it to fix the CSS.</li>
+          <li>Drop in a design export and ask for the component.</li>
+          <li>Hand it a PDF spec and ask it to implement against it.</li>
+        </ul>
+      </div>
+
+      <div class="tab-panel" role="tabpanel" id="panel-claudemd" aria-labelledby="tab-claudemd" hidden>
+        <p>The file pays off in proportion to what you put in it. Aim for what you'd tell a new teammate on day one — concrete commands, where things live, and the rules that aren't obvious from the code.</p>
+        <pre><code># CLAUDE.md
+
+## Commands
+- Test: `npm run test`
+- Lint: `npm run lint` (run before every commit)
+- Dev server: `npm run dev`
+
+## Architecture
+- `src/api/` — REST handlers · `src/db/` — Prisma models
+- Auth lives in `src/auth/`; never roll your own.
+
+## Conventions
+- TypeScript strict mode. No `any`.
+- Use the existing `Result&lt;T&gt;` type for fallible calls.
+
+## Don't
+- Don't edit `generated/` — it's built from the schema.
+- Don't add dependencies without asking first.
+
+@docs/architecture.md   # pull in deeper context on demand</code></pre>
+        <div class="callout" style="--accent: var(--c-teal)">
+          <div class="c-title">Keep it lean</div>
+          <p>It loads into every session's context, so link out with <code>@import</code> instead of pasting long docs inline. Grow it when Claude gets something wrong — don't pre-write a novel.</p>
+        </div>
+      </div>
+
+      <div class="tab-panel" role="tabpanel" id="panel-cost" aria-labelledby="tab-cost" hidden>
+        <p>Using it heavily <em>and</em> sustainably comes down to two habits: pick the right model, and watch your context window.</p>
+        <h4>Right model for the job</h4>
+        <p>Opus or Fable for hard reasoning, Sonnet for routine edits, Haiku for mechanical work. Switch with <code>/model</code>. Running the biggest model on small tasks is the most common way to overspend.</p>
+        <h4>Watch usage and context</h4>
+        <ul class="tight">
+          <li><code>/usage</code> — your plan, session and weekly usage bars, and which skills, subagents, and MCP servers ate the most.</li>
+          <li><code>/context</code> — what's filling the context window (history, files, <code>CLAUDE.md</code>, loaded skills). A bloated context costs more <em>and</em> degrades quality.</li>
+          <li><code>/clear</code> between unrelated tasks; <code>/compact</code> (or <code>/compact focus on the API changes</code>) to summarize a long one.</li>
+        </ul>
+        <div class="callout" style="--accent: var(--c-amber)">
+          <div class="c-title">Subscription vs API</div>
+          <p>A flat <strong>Pro/Max</strong> plan is best for heavy interactive use; a pay-per-token <strong>API key</strong> suits spiky usage or scripting into CI.</p>
+        </div>
+      </div>
+
+      <div class="tab-panel" role="tabpanel" id="panel-safety" aria-labelledby="tab-safety" hidden>
+        <p>Speed is the point, but a few defaults keep you out of trouble. This is the judgment that separates people who use it well from people who get burned.</p>
+        <h4>Permission modes + your allowlist</h4>
+        <p>By default Claude asks before edits and commands. <code>acceptEdits</code> stops asking for file edits, <code>plan</code> is read-only-propose, and <code>bypassPermissions</code> skips all prompts. Tune what's auto-allowed in <code>settings.json</code> — deny always wins over allow:</p>
+        <pre><code>{
+  "permissions": {
+    "allow": ["Bash(npm run lint)", "Read(~/.zshrc)"],
+    "deny":  ["Read(./.env)", "Read(./secrets/**)"]
+  }
+}</code></pre>
+        <h4>OS-level sandboxing</h4>
+        <p>For isolation of bash commands, <code>/sandbox</code> (or <code>"sandbox": {"enabled": true}</code> in settings) confines filesystem and network access. Built in on macOS (Seatbelt) and Linux/WSL2 (needs <code>bubblewrap</code> + <code>socat</code>); not on native Windows. Safe commands can then run without prompts, because the OS enforces the boundary.</p>
+        <div class="callout" style="--accent: var(--c-red)">
+          <div class="c-title">Bypass mode is for sandboxes only</div>
+          <p><code>--dangerously-skip-permissions</code> (the <code>bypassPermissions</code> mode) skips every prompt — only use it inside a container or VM where Claude can't do harm. Even then, <code>rm -rf /</code> and <code>rm -rf ~</code> stay blocked as a circuit breaker.</p>
+        </div>
+        <h4>MCP servers can read your data</h4>
+        <p>A connected server gets real access — your database, files, messages. Only add servers you trust, and check what each one is allowed to do.</p>
+        <h4>Always review the output</h4>
+        <p>Claude is fast and usually right, not infallible. Read the diff before accepting, run the tests, and don't ship generated code you haven't understood. Plan mode plus small changes makes this the easy path, not the chore.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="path">
+  <div class="wrap">
+    <p class="kicker">Don't do it all at once</p>
+    <h2>A sane learning path</h2>
+    <p>Trying every layer in week one is how people bounce off it. This order compounds.</p>
+    <ol class="path">
+      <li><span class="step-n">1</span><div class="step-t">Week 1 — live in the loop</div><div class="step-d">Install, then use <code>/plan</code> on anything non-trivial, <code>@</code>-mention files, <code>/clear</code> between tasks. Get the rhythm.</div></li>
+      <li><span class="step-n">2</span><div class="step-t">Week 1–2 — grow your <code>CLAUDE.md</code></div><div class="step-d">Run <code>/init</code>, then add a fact every time Claude lacks context. This alone doubles its usefulness.</div></li>
+      <li><span class="step-n">3</span><div class="step-t">Week 2–3 — wire in MCP</div><div class="step-d">Add 1–2 servers you'll actually use. If you keep notes, connect Obsidian as durable memory.</div></li>
+      <li><span class="step-n">4</span><div class="step-t">Week 3+ — package the repeats</div><div class="step-d">Turn recurring prompts into slash commands and skills. Add a hook or two for your non-negotiables.</div></li>
+      <li><span class="step-n">5</span><div class="step-t">At the ceiling — scale</div><div class="step-d">Reach for subagents, then multi-agent workflows, when one conversation can't hold the job.</div></li>
+    </ol>
+  </div>
+</section>
+
+<section id="flags">
+  <div class="wrap">
+    <div class="callout" style="--accent: var(--c-blue)">
+      <div class="c-title">A few honesty flags</div>
+      <p>The commands and steps on this page were checked against the official docs at <a href="https://code.claude.com/docs">code.claude.com/docs</a> on <strong>23 June 2026</strong> — install paths, IDE setup, sandboxing, permissions, and the <code>/usage</code> and <code>/context</code> commands are all doc-verified.</p>
+      <p>Two small things stay flagged as uncertain: <code>/vim</code> mode and the <code>#</code> quick-memory shortcut may have been removed — use <code>/memory</code> instead. And Claude Code ships fast, so <code>/help</code> is always the ground truth for your build.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Claude Code, to the fullest.</strong> The model is the engine; context, tools, reuse, and scale are the rest of the car. Build them up in that order and the thing compounds.</p>
+    <p style="margin-top:10px;">Run <code>/help</code> any time · docs at code.claude.com/docs</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var lists = Array.prototype.slice.call(document.querySelectorAll('.tablist'));
+  lists.forEach(function (list) {
+    var tabs = Array.prototype.slice.call(list.querySelectorAll('.tab-btn'));
+    if (!tabs.length) return;
+    function activate(tab) {
+      tabs.forEach(function (t) {
+        var sel = t === tab;
+        t.setAttribute('aria-selected', sel ? 'true' : 'false');
+        t.tabIndex = sel ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute('aria-controls'));
+        if (panel) panel.hidden = !sel;
+      });
+    }
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { activate(t); });
+      t.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          var dir = e.key === 'ArrowRight' ? 1 : -1;
+          var next = tabs[(i + dir + tabs.length) % tabs.length];
+          next.focus();
+          activate(next);
+        }
+      });
+    });
+    list.__activate = activate;
+  });
+  var osList = document.querySelector('#tab-mac') && document.querySelector('#tab-mac').closest('.tablist');
+  if (osList && osList.__activate) {
+    var ua = ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || navigator.userAgent || '').toLowerCase();
+    var pick = null;
+    if (ua.indexOf('win') !== -1) pick = document.getElementById('tab-win');
+    else if (ua.indexOf('linux') !== -1 && ua.indexOf('android') === -1) pick = document.getElementById('tab-linux');
+    else if (ua.indexOf('mac') !== -1 || ua.indexOf('iphone') !== -1 || ua.indexOf('ipad') !== -1) pick = document.getElementById('tab-mac');
+    if (pick) osList.__activate(pick);
+  }
+})();
+</script>
+
+</body>
+</html>
