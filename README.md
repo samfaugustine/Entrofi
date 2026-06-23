@@ -1,31 +1,54 @@
-# Claude Code — setup & mastery
+# Entrofi — Landing Page
 
-A single-page guide to setting up and getting the most out of [Claude Code](https://code.claude.com/docs), Anthropic's command-line coding agent.
+Production-grade marketing site for **Entrofi**, an AI implementation company that installs AI systems into real businesses.
 
-It's a self-contained `index.html` — no build step, no dependencies, works offline. Open it in any browser, or serve it (see below).
+Built as a designed product interface, not a template: a real design-system contract, copy modeled as typed data, an accessibility + reduced-motion contract, and a performance budget on every animation.
 
-**In a hurry?** [`overview.html`](overview.html) is the one-screen companion — the same habits distilled to a single visual page (context budget, CLAUDE.md, Obsidian, Cowork, power features, and a do/don't).
+## Stack
 
-## What's inside
+- **Next.js 14** (App Router) + **TypeScript**
+- **TailwindCSS** — token-driven design system (`tailwind.config.ts`)
+- **Framer Motion** — scroll reveals + the interactive system preview
+- **lucide-react** — icons
+- No UI kit dependency; primitives are hand-built in the shadcn spirit.
 
-- **The amplification stack** — the mental model: context, tools, reuse, scale.
-- **Install** — end-to-end, with clickable tabs for macOS, Windows, and Linux (native installer, package managers, npm, and the native-vs-WSL2 decision).
-- **The daily loop** — plan mode, `@` file mentions, context management, permissions, models.
-- **CLAUDE.md** — project memory, with an example file.
-- **MCP servers** — connecting your tools, including Obsidian as a persistent knowledge layer.
-- **Skills, slash commands, hooks** — making workflows repeatable.
-- **Subagents & workflows** — scaling beyond one conversation.
-- **Essentials** — first session, IDE setup, images, cost, and safety (six clickable tabs).
-
-## View it locally
-
-Open `index.html` directly in a browser, or run a static server:
+## Run
 
 ```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
+npm install
+npm run dev      # http://localhost:3400
+npm run build    # production build
 ```
 
-## Accuracy
+## Architecture
 
-Commands and steps were verified against the official docs at `code.claude.com/docs` on 23 June 2026. Claude Code ships quickly — run `/help` for the ground truth on your installed version.
+```
+app/
+  layout.tsx        Root layout — fonts, SEO metadata, JSON-LD, skip link
+  page.tsx          Section composition (server component)
+  globals.css       Design-system CSS layer + reduced-motion contract
+components/
+  ui/               Primitives: Button, Card, Badge, Section, Logo
+  motion/           Reveal / RevealGroup / RevealItem (scroll choreography)
+  sections/         One file per page section
+lib/
+  content.ts        All copy as typed data — single source of truth
+  utils.ts          cn() class merger
+```
+
+## Design system
+
+- **Color** — dark-first; base `#07070A` + three surface elevations; one accent ramp (cyan → blue → violet).
+- **Type** — Inter, fixed editorial scale (`display / h1 / h2 / h3 / lead / body`), tight tracking on headings.
+- **Spacing** — Tailwind's 4px base scale; 1280px max container.
+- **Motion** — single easing curve `[0.16, 1, 0.3, 1]`, fade + 16px lift, staggered. Every animation collapses under `prefers-reduced-motion`.
+
+## Notable engineering
+
+- **Hero network canvas** (`HeroBackground.tsx`) — DPR-capped, paused offscreen (IntersectionObserver) and when the tab is hidden, fully skipped under reduced motion with a static gradient fallback.
+- **Interactive system preview** (`SystemPreview.tsx`) — tabbed, auto-playing workflow simulation driven entirely from `lib/content.ts`.
+- **Copy as data** — rewording the funnel never touches a component.
+
+## Editing copy
+
+All page text lives in `lib/content.ts`. Change positioning, sections, or the workflow simulations there — components render from it.
