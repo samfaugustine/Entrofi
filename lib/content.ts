@@ -18,10 +18,12 @@ export const site = {
 } as const;
 
 export const nav = {
+  // Section links are absolute (/#…) so they work from any page, not just home.
   links: [
-    { label: "System", href: "#system" },
-    { label: "Process", href: "#how" },
-    { label: "Use cases", href: "#use-cases" },
+    { label: "System", href: "/#system" },
+    { label: "Process", href: "/#how" },
+    { label: "Use cases", href: "/#use-cases" },
+    { label: "Pricing", href: "/pricing" },
     { label: "Resources", href: "/resources" },
   ],
 } as const;
@@ -260,6 +262,95 @@ export const resources = {
         "The complete, no-fluff guide to installing Claude Code and running it like an operator: context budget, CLAUDE.md, MCP, skills, subagents, and the daily loop.",
       href: "/resources/claude-code",
       meta: "Self-contained · ~20 min read",
+    },
+  ],
+} as const;
+
+/**
+ * Pricing — low → high → custom. Implementation is one-time; ongoing AI
+ * systems bill per seat (SMB + Enterprise). Website revamp is the high-ticket
+ * offer. Prices/features are starting points — refine here once scoped.
+ */
+export const pricing = {
+  eyebrow: "Pricing",
+  heading: "Priced for the leverage it installs.",
+  sub: "Start with a single workflow or rebuild your whole operation. Implementation is one-time; ongoing AI systems are billed per seat.",
+  note: "Starting points, not quotes — final scope and price are set on your strategy call. Annual and multi-seat discounts available.",
+  tiers: [
+    {
+      id: "launch",
+      purchasable: true,
+      perSeat: false,
+      name: "Launch",
+      tagline: "Your first AI system, installed.",
+      price: "$1,950",
+      unit: "one-time",
+      highlight: false,
+      badge: "",
+      cta: { label: "Get started", href: "#book" },
+      features: [
+        "Operations & workflow audit",
+        "AI opportunity map, ranked by ROI",
+        "1 core workflow automated & deployed",
+        "Documentation + team handoff",
+      ],
+    },
+    {
+      id: "operate",
+      purchasable: true,
+      perSeat: true,
+      name: "Operate",
+      tagline: "Always-on AI systems for your team.",
+      price: "$99",
+      unit: "per seat / mo",
+      highlight: true,
+      badge: "Most popular",
+      cta: { label: "Subscribe", href: "#book" },
+      features: [
+        "Everything in Launch",
+        "Up to 5 workflows automated",
+        "AI agents configured with guardrails",
+        "CRM + marketing ops, integrated",
+        "Monthly optimization & support",
+      ],
+    },
+    {
+      id: "revamp",
+      purchasable: false,
+      perSeat: false,
+      name: "Website Revamp",
+      tagline: "A new site, with AI built in.",
+      price: "from $12k",
+      unit: "one-time",
+      highlight: false,
+      badge: "High-ticket",
+      cta: { label: "Book a call", href: "#book" },
+      features: [
+        "Full redesign & rebuild",
+        "AI lead capture, qualifying & follow-up",
+        "Conversion-optimized funnels",
+        "Analytics + automation wired in",
+        "Operate plan, ready to run",
+      ],
+    },
+    {
+      id: "enterprise",
+      purchasable: false,
+      perSeat: false,
+      name: "Enterprise",
+      tagline: "AI systems at company scale.",
+      price: "Custom",
+      unit: "volume per seat",
+      highlight: false,
+      badge: "",
+      cta: { label: "Talk to us", href: "#book" },
+      features: [
+        "Custom systems across departments",
+        "Dedicated implementation team",
+        "Volume per-seat pricing",
+        "SLA + priority support",
+        "Security & compliance review",
+      ],
     },
   ],
 } as const;

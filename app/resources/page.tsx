@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { ArrowUpRight, BookOpen } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
+import { ManageBillingButton } from "@/components/sections/ManageBillingButton";
 import { createClient } from "@/lib/supabase/server";
-import { resources } from "@/lib/content";
+import { resources, pricing } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Resources",
@@ -20,6 +21,33 @@ export default async function ResourcesPage() {
 
   // Defense in depth — middleware already gates this, but never trust one layer.
   if (!user) redirect("/login?next=/resources");
+
+  // Billing summary (RLS scopes both reads to this user's own rows).
+  const { data: cust } = await supabase
+    .from("stripe_customers")
+    .select("stripe_customer_id")
+    .maybeSingle();
+  const hasBilling = Boolean(cust?.stripe_customer_id);
+
+  // Prefer the live subscription; fall back to the most recent one-time purchase.
+  const { data: activeSubs } = await supabase
+    .from("subscriptions")
+    .select("tier, status, quantity, mode")
+    .eq("mode", "subscription")
+    .in("status", ["active", "trialing", "past_due"])
+    .order("current_period_end", { ascending: false })
+    .limit(1);
+  const { data: latest } = await supabase
+    .from("subscriptions")
+    .select("tier, status, quantity, mode")
+    .order("updated_at", { ascending: false })
+    .limit(1);
+  const sub = (activeSubs?.[0] ?? latest?.[0]) as
+    | { tier?: string; status?: string; quantity?: number; mode?: string }
+    | undefined;
+  const planName = sub
+    ? pricing.tiers.find((t) => t.id === sub.tier)?.name ?? "Active plan"
+    : null;
 
   return (
     <div className="relative min-h-screen">
@@ -57,6 +85,28 @@ export default async function ResourcesPage() {
         </span>
         <h1 className="mt-4 text-h2 font-semibold text-ink">{resources.heading}</h1>
         <p className="mt-3 max-w-2xl text-lead text-ink-muted">{resources.sub}</p>
+
+        {/* Billing summary */}
+        <div className="mt-10 flex flex-col gap-4 rounded-2xl border border-line bg-surface-1 p-6 shadow-card sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-ink-faint">
+              Your plan
+            </p>
+            <p className="mt-1.5 text-h3 font-semibold text-ink">
+              {planName ?? "No active plan"}
+              {sub?.mode === "subscription" && sub?.quantity ? (
+                <span className="text-base font-normal text-ink-muted">
+                  {" · "}
+                  {sub.quantity} {sub.quantity === 1 ? "seat" : "seats"}
+                </span>
+              ) : null}
+            </p>
+            <p className="mt-1 text-sm capitalize text-ink-muted">
+              {sub?.status ?? "Browse plans to get started."}
+            </p>
+          </div>
+          <ManageBillingButton hasBilling={hasBilling} />
+        </div>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {resources.items.map((r) => (
