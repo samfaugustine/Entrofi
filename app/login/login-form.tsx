@@ -17,6 +17,11 @@ function GoogleIcon({ className }: { className?: string }) {
   );
 }
 
+// Google sign-in stays hidden until a Google Cloud OAuth client is configured
+// in Supabase (blocked on enabling 2-step verification on the Google account).
+// Flip to true once that's done — no other change needed.
+const GOOGLE_ENABLED = false;
+
 type Mode = "signin" | "signup";
 
 export function LoginForm() {
@@ -92,25 +97,29 @@ export function LoginForm() {
 
   return (
     <div className="w-full">
-      <button
-        type="button"
-        onClick={handleGoogle}
-        disabled={oauthLoading || loading}
-        className="flex h-11 w-full items-center justify-center gap-2.5 rounded-full border border-line-strong bg-surface-2 text-sm font-medium text-ink transition-colors hover:bg-surface-3 disabled:opacity-60"
-      >
-        {oauthLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <GoogleIcon />
-        )}
-        Continue with Google
-      </button>
+      {GOOGLE_ENABLED && (
+        <>
+          <button
+            type="button"
+            onClick={handleGoogle}
+            disabled={oauthLoading || loading}
+            className="flex h-11 w-full items-center justify-center gap-2.5 rounded-full border border-line-strong bg-surface-2 text-sm font-medium text-ink transition-colors hover:bg-surface-3 disabled:opacity-60"
+          >
+            {oauthLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <GoogleIcon />
+            )}
+            Continue with Google
+          </button>
 
-      <div className="my-5 flex items-center gap-3 text-xs text-ink-faint">
-        <span className="h-px flex-1 bg-line" />
-        or
-        <span className="h-px flex-1 bg-line" />
-      </div>
+          <div className="my-5 flex items-center gap-3 text-xs text-ink-faint">
+            <span className="h-px flex-1 bg-line" />
+            or
+            <span className="h-px flex-1 bg-line" />
+          </div>
+        </>
+      )}
 
       <form onSubmit={handleEmail} className="space-y-3">
         <div>
