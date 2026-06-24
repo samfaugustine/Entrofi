@@ -31,7 +31,7 @@ export function Nav() {
     >
       <nav className="container flex h-16 items-center justify-between gap-4">
         <Link href="#top" aria-label="Entrofi home">
-          <Logo />
+          <Logo size="md" />
         </Link>
 
         <div className="hidden items-center gap-6 md:flex lg:gap-8">

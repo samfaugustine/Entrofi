@@ -2,8 +2,8 @@ import { cn } from "@/lib/utils";
 
 /**
  * Entrofi lockup — a radial particle burst (entropy dispersing from a dense
- * core into order), rendered in the Claude-orange ramp via a radial gradient
- * (hot amber core → deep rust at the edges) with an outward opacity falloff.
+ * core), rendered in the Claude-orange ramp via a radial gradient (hot amber
+ * core → deep rust at the edges) with an outward opacity falloff.
  *
  * Dots are generated parametrically so density/scale are tunable in one place.
  */
@@ -32,25 +32,38 @@ const DOTS: Dot[] = (() => {
   return out;
 })();
 
+type Size = "sm" | "md" | "lg";
+
+const SIZES: Record<Size, { px: number; text: string; gap: string }> = {
+  sm: { px: 26, text: "text-[1.05rem]", gap: "gap-2.5" }, // footer / login / resources
+  md: { px: 34, text: "text-[1.2rem]", gap: "gap-3" }, // nav
+  lg: { px: 96, text: "text-5xl", gap: "gap-2" }, // hero emblem
+};
+
 export function Logo({
   className,
   showWordmark = true,
+  size = "sm",
 }: {
   className?: string;
   showWordmark?: boolean;
+  size?: Size;
 }) {
+  const s = SIZES[size];
+  const gradId = `entrofi-burst-${size}`;
+
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
+    <span className={cn("inline-flex items-center", s.gap, className)}>
       <svg
-        width="26"
-        height="26"
+        width={s.px}
+        height={s.px}
         viewBox="0 0 40 40"
         fill="none"
         aria-hidden
         className="shrink-0"
       >
         <defs>
-          <radialGradient id="entrofi-burst" cx="50%" cy="50%" r="55%">
+          <radialGradient id={gradId} cx="50%" cy="50%" r="55%">
             <stop offset="0%" stopColor="#F2AE77" />
             <stop offset="55%" stopColor="#D97757" />
             <stop offset="100%" stopColor="#BE5A3A" />
@@ -62,13 +75,15 @@ export function Logo({
             cx={d.x}
             cy={d.y}
             r={d.r}
-            fill="url(#entrofi-burst)"
+            fill={`url(#${gradId})`}
             opacity={d.op}
           />
         ))}
       </svg>
       {showWordmark && (
-        <span className="text-[1.05rem] font-semibold tracking-tight text-ink">
+        <span
+          className={cn(s.text, "font-semibold tracking-tight text-ink")}
+        >
           Entrofi
         </span>
       )}
