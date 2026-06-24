@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ShieldCheck, Zap, Boxes } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Logo } from "@/components/ui/Logo";
 import { HeroBackground } from "./HeroBackground";
 import { hero, site } from "@/lib/content";
 
@@ -23,7 +24,11 @@ export function Hero() {
       <HeroBackground />
 
       <div className="container relative flex min-h-[88vh] flex-col items-center justify-center pt-28 pb-20 text-center">
-        <motion.div {...rise(0)}>
+        <motion.div {...rise(0)} className="mb-7">
+          <Logo size="lg" />
+        </motion.div>
+
+        <motion.div {...rise(0.06)}>
           <Badge>{hero.badge}</Badge>
         </motion.div>
 
