@@ -34,10 +34,12 @@ const DOTS: Dot[] = (() => {
 
 type Size = "sm" | "md" | "lg";
 
+// Gap scales with the mark (~8% of its width) so the mark↔wordmark spacing
+// reads identically at every size — nav, footer, and the hero lockup all match.
 const SIZES: Record<Size, { px: number; text: string; gap: string }> = {
-  sm: { px: 26, text: "text-[1.05rem]", gap: "gap-2.5" }, // footer / login / resources
-  md: { px: 34, text: "text-[1.2rem]", gap: "gap-3" }, // nav
-  lg: { px: 96, text: "text-5xl", gap: "gap-2" }, // hero emblem
+  sm: { px: 26, text: "text-[1.05rem]", gap: "gap-[2px]" }, // footer / login / resources
+  md: { px: 34, text: "text-[1.2rem]", gap: "gap-[3px]" }, // nav
+  lg: { px: 96, text: "text-5xl", gap: "gap-2" }, // hero emblem (8px)
 };
 
 export function Logo({
