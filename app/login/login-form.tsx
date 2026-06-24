@@ -17,10 +17,8 @@ function GoogleIcon({ className }: { className?: string }) {
   );
 }
 
-// Google sign-in stays hidden until a Google Cloud OAuth client is configured
-// in Supabase (blocked on enabling 2-step verification on the Google account).
-// Flip to true once that's done — no other change needed.
-const GOOGLE_ENABLED = false;
+// Google sign-in: backed by a Google Cloud OAuth client wired into Supabase.
+const GOOGLE_ENABLED = true;
 
 type Mode = "signin" | "signup";
 
